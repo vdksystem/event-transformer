@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  event-transformer
+  
+  Transforms cloud-trail based events
+
+Metadata:
+  AWS::ServerlessRepo::Application:
+    Name: event-transformer
+    Description: Transform CloudTrail base events
+    Author: dkuleshov@adimen.tech
+    SpdxLicenseId: Apache-2.0
+    LicenseUrl: LICENSE.txt
+    ReadmeUrl: README.md
+    Labels: ['event']
+    HomePageUrl: https://github.com/user1/my-app-project
+    SemanticVersion: 0.0.1
+    SourceCodeUrl: https://github.com/user1/my-app-project
+
+Globals:
+  Function:
+    Timeout: 5
+
+Parameters:
+  SourceName:
+    Type: String
+    Default: "k8s.secrets"
+    Description: "Name of the source to use in event source."
+
+Resources:
+  TransformFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: event-transformer/
+      Handler: main
+      Runtime: go1.x
+      Tracing: PassThrough
+      Events:
+        CatchAll:
+          Type: CloudWatchEvent
+          Properties:
+            Pattern:
+              source: ["aws.secretsmanager"]
+              region: [!Ref "AWS::Region"]
+            InputPath: "$.detail.requestParameters.secretId"
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          SOURCE: !Ref SourceName
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:DescribeSecret
+                - secretsmanager:ListSecretVersionIds
+                - secretsmanager:ListSecrets
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - events:PutEvents
+                - events:ListEventBuses
+              Resource: '*'
+
+Outputs:
+  SourceName:
+    Description: "Use this value as source in CloudWatch event rule"
+    Value: !Ref SourceName
