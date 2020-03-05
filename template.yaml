@@ -14,9 +14,9 @@ Metadata:
     LicenseUrl: LICENSE.txt
     ReadmeUrl: README.md
     Labels: ['event']
-    HomePageUrl: https://github.com/user1/my-app-project
+    HomePageUrl: https://github.com/vdksystem/event-transformer
     SemanticVersion: 0.0.1
-    SourceCodeUrl: https://github.com/user1/my-app-project
+    SourceCodeUrl: https://github.com/vdksystem/event-transformer
 
 Globals:
   Function:

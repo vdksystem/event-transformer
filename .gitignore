@@ -1,3 +1,4 @@
 /.aws-sam/
 /event-transformer/vendor/
 /.idea/
+/event-transformer/go.sum
