@@ -9,13 +9,13 @@ Metadata:
   AWS::ServerlessRepo::Application:
     Name: event-transformer
     Description: Transform CloudTrail base events
-    Author: dkuleshov@adimen.tech
+    Author: Dmitry Kuleshov
     SpdxLicenseId: Apache-2.0
     LicenseUrl: LICENSE.txt
     ReadmeUrl: README.md
     Labels: ['event']
     HomePageUrl: https://github.com/vdksystem/event-transformer
-    SemanticVersion: 0.0.1
+    SemanticVersion: 0.0.2
     SourceCodeUrl: https://github.com/vdksystem/event-transformer
 
 Globals:
@@ -27,6 +27,10 @@ Parameters:
     Type: String
     Default: "k8s.secrets"
     Description: "Name of the source to use in event source."
+  EventBus:
+    Type: String
+    Default: "default"
+    Description: "Event bus name where to put events"
 
 Resources:
   TransformFunction:
@@ -42,11 +46,11 @@ Resources:
           Properties:
             Pattern:
               source: ["aws.secretsmanager"]
-              region: [!Ref "AWS::Region"]
             InputPath: "$.detail.requestParameters.secretId"
-      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+      Environment:
         Variables:
           SOURCE: !Ref SourceName
+          EventBus: !Ref EventBus
       Policies:
         - Version: '2012-10-17'
           Statement:

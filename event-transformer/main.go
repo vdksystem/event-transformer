@@ -18,12 +18,13 @@ type Tag struct {
 }
 
 type Detail struct {
-	SecretId string
-	Tags     []Tag
+	SecretId string `json:"secretId"`
+	Tags     []Tag  `json:"tags"`
 }
 
 func LambdaHandler(ctx context.Context, secretName string) {
 	sourceName := os.Getenv("SOURCE")
+	eventBusName := os.Getenv("EventBus")
 
 	sess, err := session.NewSession(&aws.Config{
 		Region: aws.String(os.Getenv("AWS_REGION"))},
@@ -46,9 +47,10 @@ func LambdaHandler(ctx context.Context, secretName string) {
 	detailType := "SecretId, Tags"
 
 	entry := cloudwatchevents.PutEventsRequestEntry{
-		Detail:     &detailS,
-		DetailType: &detailType,
-		Source:     &sourceName,
+		Detail:       &detailS,
+		DetailType:   &detailType,
+		Source:       &sourceName,
+		EventBusName: &eventBusName,
 	}
 
 	entries = append(entries, &entry)
